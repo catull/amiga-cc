@@ -34,7 +34,7 @@ fi
 echo "Command to unpack .lha is ${lha}."
 
 mkdir -p vbcc_tools
-mkdir -p vbcc
+mkdir -p vbcc/targets
 
 cd vbcc_tools
 
@@ -42,6 +42,7 @@ ${fetch} http://sun.hasenbraten.de/vasm/release/vasm.tar.gz
 ${fetch} http://sun.hasenbraten.de/vlink/release/vlink.tar.gz
 ${fetch} http://www.ibaug.de/vbcc/vbcc.tar.gz
 ${fetch} http://phoenix.owl.de/vbcc/current/vbcc_target_m68k-amigaos.lha
+${fetch} http://phoenix.owl.de/vbcc/current/vbcc_target_m68k-kick13.lha
 ${fetch} http://phoenix.owl.de/vbcc/current/vbcc_unix_config.tar.gz
 
 tar -zxpf vbcc.tar.gz
@@ -50,14 +51,16 @@ mkdir -p bin
 ln -s ucpp vcpp
 TARGET=m68k
 make CC='gcc -std=c9x -g' TARGET=${TARGET} bin/dtgen bin/vc bin/vprof bin/vbcc${TARGET}
-cp -prf bin ../../vbcc
+cp -pfr bin ../../vbcc/
 TARGET=m68ks
 make CC='gcc -std=c9x -g' TARGET=${TARGET} bin/vbcc${TARGET}
-cp -prf bin ../../vbcc
+cp -pfr bin ../../vbcc/
 
 cd ..
+${lha} -x -qf vbcc_target_m68k-kick13.lha
 ${lha} -x -qf vbcc_target_m68k-amigaos.lha
-cp -pr vbcc_target_m68k-amigaos/* ../vbcc
+cp -pfr vbcc_target_m68k-kick13/targets/* ../vbcc/targets/
+cp -pfr vbcc_target_m68k-amigaos/targets/* ../vbcc/targets/
 
 cd ../vbcc
 tar -zxpf ../vbcc_tools/vbcc_unix_config.tar.gz
@@ -68,13 +71,13 @@ cd vasm
 make CPU=m68k SYNTAX=mot ; make clean
 make CPU=m68k SYNTAX=oldstyle ; make clean
 make CPU=m68k SYNTAX=std
-cp -pf vasmm68k_mot vasmm68k_oldstyle vasmm68k_std vobjdump ../../vbcc/bin
+cp -pf vasmm68k_mot vasmm68k_oldstyle vasmm68k_std vobjdump ../../vbcc/bin/
 
 cd ..
 tar -zxpf vlink.tar.gz
 cd vlink
 make
-cp -pf vlink ../../vbcc/bin
+cp -pf vlink ../../vbcc/bin/
 
 cd ../../vbcc
 mkdir -p NDK_3.2
@@ -83,7 +86,8 @@ cd NDK_3.2
 ${fetch} https://aminet.net/dev/misc/NDK3.2.lha
 ${lha} -x -qf NDK3.2.lha
 cd ..
-cp -prf NDK_3.2/Include_h/* targets/m68k-amigaos/include
+cp -pfr NDK_3.2/Include_h/* targets/m68k-amigaos/include/
+cp -pfr NDK_3.2/Include_h/* targets/m68k-kick13/include/
 rm -rf NDK_3.2
 
 cd ..
