@@ -48,7 +48,6 @@ ${fetch} http://phoenix.owl.de/vbcc/current/vbcc_unix_config.tar.gz
 tar -zxpf vbcc.tar.gz
 cd vbcc
 mkdir -p bin
-ln -s ucpp vcpp
 TARGET=m68k
 make CC='gcc -std=c9x -g' TARGET=${TARGET} bin/dtgen bin/vc bin/vprof bin/vbcc${TARGET}
 cp -pfr bin ../../vbcc/
@@ -80,19 +79,20 @@ make
 cp -pf vlink ../../vbcc/bin/
 
 cd ../../vbcc
-mkdir -p NDK_3.2
 
-cd NDK_3.2
 ${fetch} https://aminet.net/dev/misc/NDK3.2.lha
-${lha} -x -qf NDK3.2.lha
-cd ..
-cp -pfr NDK_3.2/Include_h/* targets/m68k-amigaos/include/
-cp -pfr NDK_3.2/Include_h/* targets/m68k-kick13/include/
-rm -rf NDK_3.2
+${lha} -x -qf -w=ndk/NDK_3.2 NDK3.2.lha
+cp -pfr ndk/NDK_3.2/Include_h/* targets/m68k-amigaos/include/
+cp -pfr ndk/NDK_3.2/Include_h/* targets/m68k-kick13/include/
+
+${fetch} -O NDK3.9.lha 'https://os.amigaworld.de/download.php?id=3'
+${lha} -x -qf -w=ndk NDK3.9.lha
+#cp -pfr ndk/NDK_3.9/Include/include_h/* targets/m68k-amigaos/include/
+rm -f NDK3.2.lha NDK3.9.lha
 
 cd ..
 
-rm -rf vbcc/Install* vbcc/bin/.dummy vbcc/bin/*.dSYM
+rm -rf vbcc/Install* vbcc/bin/.dummy vbcc/bin/*.dSYM vbcc/ndk/*.info
 chmod 644 vbcc/config/*
 
 cp -pfr vbcc/* $VBCC/
